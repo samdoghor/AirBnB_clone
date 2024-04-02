@@ -1,62 +1,51 @@
 #!/usr/bin/python3
-"""
-Defines the BaseModel class.
-It defines all common attributes/methods for other classes
-"""
-
+"""Defines the BaseModel class."""
+import models
+from uuid import uuid4
 from datetime import datetime
-import uuid
-from models.engine.file_storage import FileStorage
 
 
 class BaseModel:
-    """
-    Represents the base model for the Airbnb Clone project
-    """
+    """Represents the BaseModel of the HBnB project."""
 
-    def __init__(self, **kwargs):
-        """
-        Initialize a new BaseModel.
-        Defines the attributes: id, created_at, updated_at
-        :param **kwargs: Key/value pairs of arguements (dict).
-        """
+    def __init__(self, *args, **kwargs):
+        """Initialize a new BaseModel.
 
-        self.id = str(uuid.uuid4())
+        Args:
+            *args (any): Unused.
+            **kwargs (dict): Key/value pairs of attributes.
+        """
+        tform = "%Y-%m-%dT%H:%M:%S.%f"
+        self.id = str(uuid4())
         self.created_at = datetime.today()
         self.updated_at = datetime.today()
-
-        date_formatter = "%Y-%m-%dT%H:%M:%S.%f"
-
         if len(kwargs) != 0:
             for k, v in kwargs.items():
-                if k in ('created_at', 'updated_at'):
-                    self.__dict__[k] = datetime.strptime(v, date_formatter)
+                if k == "created_at" or k == "updated_at":
+                    self.__dict__[k] = datetime.strptime(v, tform)
                 else:
                     self.__dict__[k] = v
         else:
-            FileStorage.new(self)
-
-    def __str__(self):
-        """print: [<class name>] (<self.id>) <self.__dict__>"""
-
-        return "[{}] ({}) {}".format(self.__class__.__name__,
-                                     self.id, self.__dict__)
+            models.storage.new(self)
 
     def save(self):
-        """
-        Method to update public instance attribute
-        'updated_at' with the current datetime
-        """
-        self.updated_at = datetime.now()
-        FileStorage.save()
+        """Update updated_at with the current datetime."""
+        self.updated_at = datetime.today()
+        models.storage.save()
 
     def to_dict(self):
+        """Return the dictionary of the BaseModel instance.
+
+        Includes the key/value pair __class__ representing
+        the class name of the object.
         """
-        Method to returns a dictionary containing all
-        keys/values of __dict__ of the instance.
-        """
-        obj_dict = self.__dict__.copy()
-        obj_dict["__class__"] = self.__class__.__name__
-        obj_dict["created_at"] = self.created_at.isoformat()
-        obj_dict["updated_at"] = self.updated_at.isoformat()
-        return obj_dict
+        rdict = self.__dict__.copy()
+        rdict["created_at"] = self.created_at.isoformat()
+        rdict["updated_at"] = self.updated_at.isoformat()
+        rdict["__class__"] = self.__class__.__name__
+        return rdict
+
+    def __str__(self):
+        """Return the print/str representation of the BaseModel instance."""
+        clname = self.__class__.__name__
+        return "[{}] ({}) {}".format(clname, self.id, self.__dict__)

@@ -1,13 +1,10 @@
 #!/usr/bin/python3
-"""
-Defines unittests for the BaseModel class
-models/base_model.py.
+"""Defines unittests for models/base_model.py.
 
-Unittest test cases:
-    TestBaseModel_instantiation (create)
+Unittest classes:
+    TestBaseModel_instantiation
     TestBaseModel_save
     TestBaseModel_to_dict
-    TestBaseModel___str__ print
 """
 import os
 import models
@@ -18,55 +15,41 @@ from models.base_model import BaseModel
 
 
 class TestBaseModel_instantiation(unittest.TestCase):
-    """
-    Testing instantiation of the BaseModel class.
-    """
+    """Unittests for testing instantiation of the BaseModel class."""
 
     def test_no_args_instantiates(self):
-        """
-        Test if BaseModel is instantiated
-        And it's a class
-        """
         self.assertEqual(BaseModel, type(BaseModel()))
 
     def test_new_instance_stored_in_objects(self):
-        """Test for new instances"""
         self.assertIn(BaseModel(), models.storage.all().values())
 
     def test_id_is_public_str(self):
-        """Test for id instances"""
         self.assertEqual(str, type(BaseModel().id))
 
     def test_created_at_is_public_datetime(self):
-        """Test for created at instances"""
         self.assertEqual(datetime, type(BaseModel().created_at))
 
     def test_updated_at_is_public_datetime(self):
-        """Test for updated at instances"""
         self.assertEqual(datetime, type(BaseModel().updated_at))
 
     def test_two_models_unique_ids(self):
-        """Test for two models unique ids"""
         bm1 = BaseModel()
         bm2 = BaseModel()
         self.assertNotEqual(bm1.id, bm2.id)
 
     def test_two_models_different_created_at(self):
-        """Test that two models are different created at"""
         bm1 = BaseModel()
         sleep(0.05)
         bm2 = BaseModel()
         self.assertLess(bm1.created_at, bm2.created_at)
 
     def test_two_models_different_updated_at(self):
-        """Test two models with different updated"""
         bm1 = BaseModel()
         sleep(0.05)
         bm2 = BaseModel()
         self.assertLess(bm1.updated_at, bm2.updated_at)
 
     def test_str_representation(self):
-        """Test the str_representation (__str__) method"""
         dt = datetime.today()
         dt_repr = repr(dt)
         bm = BaseModel()
@@ -79,12 +62,10 @@ class TestBaseModel_instantiation(unittest.TestCase):
         self.assertIn("'updated_at': " + dt_repr, bmstr)
 
     def test_args_unused(self):
-        """Test for unused arguments"""
         bm = BaseModel(None)
         self.assertNotIn(None, bm.__dict__.values())
 
     def test_instantiation_with_kwargs(self):
-        """Test instantiation with keyword arguments"""
         dt = datetime.today()
         dt_iso = dt.isoformat()
         bm = BaseModel(id="345", created_at=dt_iso, updated_at=dt_iso)
@@ -92,13 +73,11 @@ class TestBaseModel_instantiation(unittest.TestCase):
         self.assertEqual(bm.created_at, dt)
         self.assertEqual(bm.updated_at, dt)
 
-    def test_instantiation_with_none_kwargs(self):
-        """Test instantiation with None kwargs"""
+    def test_instantiation_with_None_kwargs(self):
         with self.assertRaises(TypeError):
             BaseModel(id=None, created_at=None, updated_at=None)
 
     def test_instantiation_with_args_and_kwargs(self):
-        """Test instantiation with arguments"""
         dt = datetime.today()
         dt_iso = dt.isoformat()
         bm = BaseModel("12", id="345", created_at=dt_iso, updated_at=dt_iso)
